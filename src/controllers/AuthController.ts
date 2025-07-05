@@ -52,7 +52,7 @@ class AuthController {
       const medic = await MedicRepository.create(req.body);
       
       // Generar tokens
-      await this.setTokensAndResponse(res, medic, req.ip);
+      await this.setTokensAndResponse(res, medic, req.ip || '');
     } catch (error) {
       console.error('Error en el registro:', error);
       res.status(500).json({ 
@@ -109,7 +109,7 @@ class AuthController {
       }
 
       // Generar tokens
-      await this.setTokensAndResponse(res, medic, req.ip);
+      await this.setTokensAndResponse(res, medic, req.ip || '');
     } catch (error) {
       console.error('Error en el login:', error);
       res.status(500).json({ 
@@ -184,7 +184,7 @@ class AuthController {
       await RefreshTokenRepository.revokeToken(refreshToken);
 
       // Generar nuevos tokens
-      await this.setTokensAndResponse(res, medic, req.ip);
+      await this.setTokensAndResponse(res, medic, req.ip || '');
     } catch (error) {
       console.error('Error al renovar token:', error);
       res.status(500).json({ 
@@ -260,7 +260,7 @@ class AuthController {
       // Revocar todos los tokens de refresco existentes
       await RefreshTokenRepository.revokeAllUserTokens(medic.id);
       // Generar nuevos tokens
-      await this.setTokensAndResponse(res, medic, req.ip);
+      await this.setTokensAndResponse(res, medic, req.ip || '');
     } catch (error) {
       console.error('Error al cambiar la contraseña:', error);
       res.status(500).json({ message: 'Error en el servidor' });

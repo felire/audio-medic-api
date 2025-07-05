@@ -50,7 +50,7 @@ const startServer = async () => {
 
     app.listen(PORT, () => {
       console.log(`Servidor corriendo en http://localhost:${PORT} (${config.NODE_ENV})`);
-      console.log(`Conectado a la base de datos: ${config.DB_NAME} en ${config.DB_HOST}`);
+      console.log(`Conectado a la base de datos`);
     });
   } catch (error) {
     console.error('Error al iniciar el servidor:', error);

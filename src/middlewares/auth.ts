@@ -29,11 +29,12 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
     // Obtener el token del header Authorization
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ 
+      res.status(401).json({ 
         success: false,
         message: 'No token provided',
         error: AuthErrorType.NO_TOKEN
       });
+      return;
     }
 
     // Extraer el token
@@ -49,13 +50,13 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
     } catch (error: any) {
       // Verificar si el error es por token expirado
       if (error.name === 'TokenExpiredError') {
-        return res.status(401).json({ 
+        res.status(401).json({ 
           success: false,
           message: 'Token expired',
           error: AuthErrorType.EXPIRED_TOKEN
         });
       } else {
-        return res.status(401).json({ 
+        res.status(401).json({ 
           success: false,
           message: 'Invalid token',
           error: AuthErrorType.INVALID_TOKEN
@@ -64,7 +65,7 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
     }
   } catch (error) {
     console.error('Authentication error:', error);
-    return res.status(401).json({ 
+    res.status(401).json({ 
       success: false,
       message: 'Authentication failed',
       error: AuthErrorType.AUTH_FAILED
@@ -77,11 +78,12 @@ export const checkSelfOrAdmin = (req: Request, res: Response, next: NextFunction
   try {
     // El usuario debe estar autenticado (este middleware debe usarse después de authenticate)
     if (!req.user) {
-      return res.status(401).json({
+      res.status(401).json({
         success: false,
         message: 'Authentication required',
         error: AuthErrorType.NO_TOKEN
       });
+      return;
     }
 
     // Obtener el ID del médico de los parámetros de la ruta
@@ -93,14 +95,14 @@ export const checkSelfOrAdmin = (req: Request, res: Response, next: NextFunction
     }
     
     // Si llegamos aquí, el usuario no está autorizado
-    return res.status(403).json({
+    res.status(403).json({
       success: false,
       message: 'You can only modify your own data',
       error: AuthErrorType.FORBIDDEN
     });
   } catch (error) {
     console.error('Authorization error:', error);
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
       message: 'Error checking permissions',
       error: 'SERVER_ERROR'
