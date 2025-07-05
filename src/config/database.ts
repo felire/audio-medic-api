@@ -2,7 +2,7 @@ import { Sequelize } from 'sequelize';
 import config from './env';
 
 const sequelize = new Sequelize(
-  'postgresql://neondb_owner:npg_L8QBqKUJ7HbT@ep-wispy-credit-acjpzm2z-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require',
+  config.DB_URL,
   {
     dialect: 'postgres',
     logging: config.NODE_ENV !== 'production',

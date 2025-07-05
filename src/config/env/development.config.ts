@@ -1,11 +1,5 @@
 export default {
   NODE_ENV: 'development',
   PORT: 3000,
-  
-  // Database Configuration
-  DB_HOST: 'localhost',
-  DB_PORT: 5432,
-  DB_USER: 'postgres',
-  DB_PASSWORD: 'postgres',
-  DB_NAME: 'audio_medic'
+  DB_URL: 'postgresql://neondb_owner:npg_L8QBqKUJ7HbT@ep-wispy-credit-acjpzm2z-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require'
 }; 
