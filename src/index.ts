@@ -5,6 +5,8 @@ import sequelize from './config/database';
 import config from './config/env';
 import authRoutes from './routes/authRoutes';
 import medicRoutes from './routes/medicRoutes';
+import patientRoutes from './routes/patientRoutes';
+import soapNoteRoutes from './routes/soapNoteRoutes';
 
 // Inicializar express
 const app = express();
@@ -29,6 +31,8 @@ app.use(express.urlencoded({ extended: true }));
 // Rutas
 app.use('/api/auth', authRoutes);
 app.use('/api/medics', medicRoutes);
+app.use('/api/patients', patientRoutes);
+app.use('/api/soap-notes', soapNoteRoutes);
 
 // Ruta base
 app.get('/', (_req, res) => {

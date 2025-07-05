@@ -7,7 +7,8 @@ export enum AuthErrorType {
   NO_TOKEN = 'NO_TOKEN',
   EXPIRED_TOKEN = 'EXPIRED_TOKEN',
   INVALID_TOKEN = 'INVALID_TOKEN',
-  AUTH_FAILED = 'AUTH_FAILED'
+  AUTH_FAILED = 'AUTH_FAILED',
+  FORBIDDEN = 'FORBIDDEN'
 }
 
 // Extender el tipo Request para incluir el usuario autenticado
@@ -29,8 +30,9 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ 
+        success: false,
         message: 'No token provided',
-        errorType: AuthErrorType.NO_TOKEN
+        error: AuthErrorType.NO_TOKEN
       });
     }
 
@@ -48,26 +50,66 @@ export const authenticate = (req: Request, res: Response, next: NextFunction) =>
       // Verificar si el error es por token expirado
       if (error.name === 'TokenExpiredError') {
         return res.status(401).json({ 
+          success: false,
           message: 'Token expired',
-          errorType: AuthErrorType.EXPIRED_TOKEN
+          error: AuthErrorType.EXPIRED_TOKEN
         });
       } else {
         return res.status(401).json({ 
+          success: false,
           message: 'Invalid token',
-          errorType: AuthErrorType.INVALID_TOKEN
+          error: AuthErrorType.INVALID_TOKEN
         });
       }
     }
   } catch (error) {
     console.error('Authentication error:', error);
     return res.status(401).json({ 
+      success: false,
       message: 'Authentication failed',
-      errorType: AuthErrorType.AUTH_FAILED
+      error: AuthErrorType.AUTH_FAILED
+    });
+  }
+};
+
+// Middleware para asegurar que un médico solo pueda modificar sus propios datos
+export const checkSelfOrAdmin = (req: Request, res: Response, next: NextFunction) => {
+  try {
+    // El usuario debe estar autenticado (este middleware debe usarse después de authenticate)
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: 'Authentication required',
+        error: AuthErrorType.NO_TOKEN
+      });
+    }
+
+    // Obtener el ID del médico de los parámetros de la ruta
+    const medicId = Number(req.params.id);
+    
+    // Si el ID del usuario autenticado coincide con el ID del médico en la ruta, permitir
+    if (req.user.id === medicId) {
+      return next();
+    }
+    
+    // Si llegamos aquí, el usuario no está autorizado
+    return res.status(403).json({
+      success: false,
+      message: 'You can only modify your own data',
+      error: AuthErrorType.FORBIDDEN
+    });
+  } catch (error) {
+    console.error('Authorization error:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error checking permissions',
+      error: 'SERVER_ERROR'
     });
   }
 };
 
 export default {
   authenticate,
+  checkSelfOrAdmin,
   AuthErrorType
 }; 
