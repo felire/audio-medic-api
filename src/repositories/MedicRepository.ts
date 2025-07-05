@@ -1,8 +1,14 @@
 import { Medic, PatientMedic } from '../models';
 import { MedicInput, MedicOutput } from '../models/Medic';
+import { Op } from 'sequelize';
 
 class MedicRepository {
   async create(payload: MedicInput): Promise<MedicOutput> {
+    // Ensure email is normalized before creating
+    if (payload.email) {
+      payload.email = payload.email.toLowerCase().trim();
+    }
+    
     const medic = await Medic.create(payload);
     return medic.toJSON() as MedicOutput;
   }
@@ -12,6 +18,11 @@ class MedicRepository {
     
     if (!medic) {
       return null;
+    }
+
+    // Normalize email if it's being updated
+    if (payload.email) {
+      payload.email = payload.email.toLowerCase().trim();
     }
 
     const updatedMedic = await medic.update(payload);
@@ -36,9 +47,19 @@ class MedicRepository {
     return medics.map(medic => medic.toJSON() as MedicOutput);
   }
 
-  async findByEmail(email: string): Promise<MedicOutput | null> {
+  async findByEmail(email: string | undefined): Promise<MedicOutput | null> {
+    // Handle undefined email
+    if (!email) {
+      return null;
+    }
+    
+    // Normalize email for search
+    const normalizedEmail = email.toLowerCase().trim();
+    
     const medic = await Medic.findOne({
-      where: { email }
+      where: { 
+        email: normalizedEmail 
+      }
     });
     return medic ? (medic.toJSON() as MedicOutput) : null;
   }
