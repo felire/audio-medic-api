@@ -2,13 +2,9 @@ import { Sequelize } from 'sequelize';
 import config from './env';
 
 const sequelize = new Sequelize(
-  config.DB_NAME,
-  config.DB_USER,
-  config.DB_PASSWORD,
+  'postgresql://neondb_owner:npg_L8QBqKUJ7HbT@ep-wispy-credit-acjpzm2z-pooler.sa-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require',
   {
-    host: config.DB_HOST,
     dialect: 'postgres',
-    port: config.DB_PORT,
     logging: config.NODE_ENV !== 'production',
     pool: {
       max: 5,
